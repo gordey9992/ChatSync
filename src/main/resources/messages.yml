@@ -32,7 +32,14 @@ bot:
 # Форматы сообщений
 formats:
   mc-to-tg: "🎮 <player>: <message>"
+  mc-to-tg-question: "❓ <player>: <message>"
   tg-to-mc: "&9[TG] &f<user>: &7<message>"
+  tg-to-mc-question: "&6[TG-Вопрос] &f<user>: &7<message>"
+
+# Сообщения фильтрации
+filter:
+  message-too-short: "&7Сообщение слишком короткое для отправки в Telegram"
+  no-punctuation: "&7Добавьте знак препинания (? ! .) для отправки в Telegram"
 
 # Сообщения плагина
 plugin:
