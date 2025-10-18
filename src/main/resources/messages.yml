@@ -49,3 +49,9 @@ plugin:
   connection-failed: "&cНе удалось подключиться к Telegram"
   config-reloaded: "&aКонфигурация перезагружена!"
   long-polling-started: "&aLong Polling запущен"
+
+  player:
+  join: "🟢 <player> зашел на сервер"
+  quit: "🔴 <player> вышел с сервера"
+  join-with-count: "🟢 <player> зашел на сервер (👥 <online>/<max>)"
+  quit-with-count: "🔴 <player> вышел с сервера (👥 <online>/<max>)"
