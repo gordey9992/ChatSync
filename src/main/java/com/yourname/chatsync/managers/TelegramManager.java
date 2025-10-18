@@ -17,6 +17,135 @@ public class TelegramManager {
     private final String botToken;
     private final String chatId;
     private boolean connected;
+private int lastUpdateId = 0;
+
+public void checkForNewMessages(int lastReceivedUpdateId) {
+    if (!connected) return;
+    
+    try {
+        String response = sendGetRequest("getUpdates?offset=" + (lastReceivedUpdateId + 1) + "&timeout=10");
+        
+        if (response.contains("\"ok\":true")) {
+            parseUpdates(response);
+        }
+    } catch (Exception e) {
+        plugin.getLogger().warning("Ошибка при проверке сообщений: " + e.getMessage());
+    }
+}
+
+private void parseUpdates(String response) {
+    try {
+        // Простой парсинг JSON (для простоты)
+        // В реальном плагине лучше использовать библиотеку JSON
+        
+        String[] updates = response.split("\\{\"update_id\"");
+        
+        for (int i = 1; i < updates.length; i++) {
+            String update = "{\"update_id\"" + updates[i];
+            
+            // Извлекаем update_id
+            int updateId = extractUpdateId(update);
+            if (updateId > lastUpdateId) {
+                lastUpdateId = updateId;
+            }
+            
+            // Извлекаем сообщение
+            if (update.contains("\"text\"")) {
+                String text = extractText(update);
+                String user = extractUsername(update);
+                
+                if (text != null && user != null && !text.trim().isEmpty()) {
+                    // Проверяем, не от нашего ли бота сообщение
+                    if (!user.toLowerCase().contains("bot")) {
+                        boolean isQuestion = text.contains("?") || 
+                                           text.toLowerCase().startsWith("как") ||
+                                           text.toLowerCase().startsWith("где") ||
+                                           text.toLowerCase().contains("вопрос");
+                        
+                        sendToMinecraft(user, text, isQuestion);
+                    }
+                }
+            }
+        }
+    } catch (Exception e) {
+        plugin.getLogger().warning("Ошибка парсинга updates: " + e.getMessage());
+    }
+}
+
+private int extractUpdateId(String update) {
+    try {
+        String[] parts = update.split("\"update_id\":");
+        if (parts.length > 1) {
+            String idStr = parts[1].split(",")[0].trim();
+            return Integer.parseInt(idStr);
+        }
+    } catch (Exception e) {
+        // Игнорируем ошибки парсинга
+    }
+    return lastUpdateId;
+}
+
+private String extractText(String update) {
+    try {
+        if (update.contains("\"text\":")) {
+            String[] parts = update.split("\"text\":\"");
+            if (parts.length > 1) {
+                String text = parts[1].split("\"")[0];
+                return text.replace("\\\"", "\"");
+            }
+        }
+    } catch (Exception e) {
+        // Игнорируем ошибки парсинга
+    }
+    return null;
+}
+
+private String extractUsername(String update) {
+    try {
+        if (update.contains("\"username\":")) {
+            String[] parts = update.split("\"username\":\"");
+            if (parts.length > 1) {
+                return parts[1].split("\"")[0];
+            }
+        }
+        
+        // Если username нет, пробуем из first_name
+        if (update.contains("\"first_name\":")) {
+            String[] parts = update.split("\"first_name\":\"");
+            if (parts.length > 1) {
+                return parts[1].split("\"")[0];
+            }
+        }
+    } catch (Exception e) {
+        // Игнорируем ошибки парсинга
+    }
+    return "Неизвестный";
+}
+
+// Обновите метод sendToMinecraft:
+public void sendToMinecraft(String user, String message, boolean isQuestion) {
+    // Игнорируем команды бота и служебные сообщения
+    if (message.startsWith("/") || user.toLowerCase().contains("bot")) {
+        return;
+    }
+    
+    // Отправка обычного сообщения в Minecraft
+    String format;
+    if (isQuestion) {
+        format = plugin.getConfigManager().getMessage("formats.tg-to-mc-question");
+    } else {
+        format = plugin.getConfigManager().getMessage("formats.tg-to-mc");
+    }
+    
+    String formattedMessage = format.replace("<user>", user).replace("<message>", message);
+    final String finalMessage = formattedMessage;
+    
+    Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.broadcastMessage(finalMessage);
+    });
+    
+    plugin.getLogger().info("Сообщение из Telegram: " + user + ": " + message);
+}
     
     public TelegramManager(ChatSync plugin) {
         this.plugin = plugin;
