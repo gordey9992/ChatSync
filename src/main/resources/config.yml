@@ -35,6 +35,12 @@ sync:
 
 # Настройки вебхука для получения сообщений из Telegram
 webhook:
-  enabled: true
+  enabled: false  # Пока отключим - сложная настройка
+  url: ""
   port: 8443
   secret-token: ""
+
+# Настройки Long Polling (проще в настройке)
+long-polling:
+  enabled: true
+  update-interval: 3  # секунды между проверками
