@@ -1,0 +1,2 @@
+# ChatSync
+Плагин ChatSync
