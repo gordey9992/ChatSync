@@ -1,0 +1,31 @@
+# Настройки Telegram бота
+telegram:
+  bot-token: "8263486505:AAHs0FDTQJrNRoMd1loLaNASWrp4SfKEuRc"
+  chat-id: "-1002935953089"
+  
+# Настройки синхронизации
+sync:
+  # Формат сообщений из Minecraft в Telegram
+  mc-to-tg-format: "🎮 <player>» <message>"
+  
+  # Формат сообщений из Telegram в Minecraft  
+  tg-to-mc-format: "§9[TG] §f<user>: §7<message>"
+  
+  # Игнорировать команды в Minecraft
+  ignore-commands: true
+  
+  # Разрешенные команды для синхронизации
+  allowed-commands:
+    - "!tg"
+    - "!telegram"
+    - "!тг"
+    - "!телеграм"
+  
+  # Префикс для команд из Telegram в Minecraft
+  tg-command-prefix: "!"
+
+# Настройки вебхука для получения сообщений из Telegram
+webhook:
+  enabled: true
+  port: 8443
+  secret-token: ""
