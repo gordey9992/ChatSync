@@ -1,0 +1,21 @@
+name: ChatSync
+version: 1.0.0
+main: com.yourname.chatsync.ChatSync
+api-version: "1.21"
+author: YourName
+description: Синхронизация чата Minecraft и Telegram
+
+commands:
+  telegram:
+    description: Управление телеграм-ботом
+    usage: /telegram <reload|status>
+    permission: chatsync.admin
+
+permissions:
+  chatsync.*:
+    description: Все разрешения ChatSync
+    children:
+      chatsync.admin: true
+  chatsync.admin:
+    description: Административные команды
+    default: op
