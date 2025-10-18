@@ -5,12 +5,14 @@ import com.yourname.chatsync.managers.TelegramManager;
 import com.yourname.chatsync.listeners.ChatListener;
 import com.yourname.chatsync.commands.TelegramCommand;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ChatSync extends JavaPlugin {
     
     private static ChatSync instance;
     private ConfigManager configManager;
     private TelegramManager telegramManager;
+    private int taskId;
     
     @Override
     public void onEnable() {
@@ -32,6 +34,9 @@ public class ChatSync extends JavaPlugin {
         // Подключение к Telegram
         if (telegramManager.connect()) {
             getLogger().info(configManager.getMessage("plugin.connected"));
+            
+            // Запускаем получение сообщений из Telegram
+            startLongPolling();
         } else {
             getLogger().warning(configManager.getMessage("plugin.connection-failed"));
         }
@@ -40,31 +45,39 @@ public class ChatSync extends JavaPlugin {
         sendWelcomeMessage();
     }
     
+    private void startLongPolling() {
+        if (!getConfig().getBoolean("long-polling.enabled", true)) {
+            return;
+        }
+        
+        int interval = getConfig().getInt("long-polling.update-interval", 3) * 20;
+        
+        taskId = new BukkitRunnable() {
+            private int lastUpdateId = 0;
+            
+            @Override
+            public void run() {
+                telegramManager.checkForNewMessages(lastUpdateId);
+                // lastUpdateId будет обновляться внутри checkForNewMessages
+            }
+        }.runTaskTimerAsynchronously(this, 100L, interval).getTaskId();
+        
+        getLogger().info("Long Polling запущен с интервалом " + interval/20 + " секунд");
+    }
+    
     @Override
     public void onDisable() {
         if (telegramManager != null) {
             telegramManager.disconnect();
         }
+        
+        // Останавливаем Long Polling
+        if (taskId != 0) {
+            getServer().getScheduler().cancelTask(taskId);
+        }
+        
         getLogger().info(configManager.getMessage("plugin.disabled"));
     }
     
-    private void sendWelcomeMessage() {
-        getServer().getConsoleSender().sendMessage("§6╔══════════════════════════════════╗");
-        getServer().getConsoleSender().sendMessage("§6║          §e§lChatSync §6v1.0.0         ║");
-        getServer().getConsoleSender().sendMessage("§6║    §aПлагин успешно загружен!     ║");
-        getServer().getConsoleSender().sendMessage("§6║ §7Синхронизация Minecraft ↔ Telegram ║");
-        getServer().getConsoleSender().sendMessage("§6╚══════════════════════════════════╝");
-    }
-    
-    public static ChatSync getInstance() {
-        return instance;
-    }
-    
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-    
-    public TelegramManager getTelegramManager() {
-        return telegramManager;
-    }
+    // ... остальные методы без изменений
 }
