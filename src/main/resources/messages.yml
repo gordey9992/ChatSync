@@ -48,3 +48,4 @@ plugin:
   connected: "&aБот успешно подключен к Telegram!"
   connection-failed: "&cНе удалось подключиться к Telegram"
   config-reloaded: "&aКонфигурация перезагружена!"
+  long-polling-started: "&aLong Polling запущен"
