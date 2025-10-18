@@ -20,10 +20,19 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!plugin.getConfig().getBoolean("notifications.player-join-quit", true)) {
+            return;
+        }
+        
         Player player = event.getPlayer();
         
         // Форматируем сообщение для Telegram
-        String format = plugin.getConfigManager().getMessage("player.join-with-count");
+        String format;
+        if (plugin.getConfig().getBoolean("notifications.show-online-count", true)) {
+            format = plugin.getConfigManager().getMessage("player.join-with-count");
+        } else {
+            format = plugin.getConfigManager().getMessage("player.join");
+        }
         
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("player", player.getName());
@@ -41,10 +50,19 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        if (!plugin.getConfig().getBoolean("notifications.player-join-quit", true)) {
+            return;
+        }
+        
         Player player = event.getPlayer();
         
         // Форматируем сообщение для Telegram
-        String format = plugin.getConfigManager().getMessage("player.quit-with-count");
+        String format;
+        if (plugin.getConfig().getBoolean("notifications.show-online-count", true)) {
+            format = plugin.getConfigManager().getMessage("player.quit-with-count");
+        } else {
+            format = plugin.getConfigManager().getMessage("player.quit");
+        }
         
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("player", player.getName());
