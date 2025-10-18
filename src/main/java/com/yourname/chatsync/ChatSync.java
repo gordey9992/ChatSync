@@ -16,6 +16,8 @@ public class ChatSync extends JavaPlugin {
     
     @Override
     public void onEnable() {
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this); // ← Добавьте эту строку
         instance = this;
         
         // Инициализация менеджеров
@@ -30,6 +32,7 @@ public class ChatSync extends JavaPlugin {
         
         // Регистрация команд
         getCommand("telegram").setExecutor(new TelegramCommand(this));
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this); // ← Добавьте эту строку
         
         // Подключение к Telegram
         if (telegramManager.connect()) {
