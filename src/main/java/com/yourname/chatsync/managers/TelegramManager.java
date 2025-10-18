@@ -57,38 +57,50 @@ public class TelegramManager {
         }
     }
     
-    public void sendToTelegram(String message) {
-        if (!connected) return;
-        
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
-                String postData = "chat_id=" + chatId + 
-                                 "&text=" + URLEncoder.encode(message, "UTF-8") + 
-                                 "&parse_mode=HTML";
+// В класс TelegramManager добавьте:
+
+public void sendToTelegram(String message, boolean isQuestion) {
+    if (!connected) return;
+    
+    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        try {
+            String chatId = isQuestion ? 
+                plugin.getConfig().getString("telegram.question-chat-id", this.chatId) : 
+                this.chatId;
                 
-                sendPostRequest(url, postData);
-            } catch (Exception e) {
-                plugin.getLogger().warning("Ошибка отправки сообщения в Telegram: " + e.getMessage());
-            }
-        });
+            String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+            String postData = "chat_id=" + chatId + 
+                             "&text=" + URLEncoder.encode(message, "UTF-8") + 
+                             "&parse_mode=HTML";
+            
+            sendPostRequest(url, postData);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Ошибка отправки сообщения в Telegram: " + e.getMessage());
+        }
+    });
+}
+
+public void sendToMinecraft(String user, String message, boolean isQuestion) {
+    if (message.startsWith("!")) {
+        // Обработка команд из Telegram
+        handleTelegramCommand(user, message);
+        return;
     }
     
-    public void sendToMinecraft(String user, String message) {
-        if (message.startsWith("!")) {
-            // Обработка команд из Telegram
-            handleTelegramCommand(user, message);
-            return;
-        }
-        
-        // Отправка обычного сообщения в Minecraft
-        String format = plugin.getConfigManager().getMessage("formats.tg-to-mc");
-        String formattedMessage = format.replace("<user>", user).replace("<message>", message);
-        
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            Bukkit.broadcastMessage(formattedMessage);
-        });
+    // Отправка обычного сообщения в Minecraft
+    String format;
+    if (isQuestion) {
+        format = plugin.getConfigManager().getMessage("formats.tg-to-mc-question");
+    } else {
+        format = plugin.getConfigManager().getMessage("formats.tg-to-mc");
     }
+    
+    String formattedMessage = format.replace("<user>", user).replace("<message>", message);
+    
+    Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.broadcastMessage(formattedMessage);
+    });
+}
     
     private void handleTelegramCommand(String user, String message) {
         String command = message.substring(1).toLowerCase();
