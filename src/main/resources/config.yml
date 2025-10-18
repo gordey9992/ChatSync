@@ -44,3 +44,14 @@ webhook:
 long-polling:
   enabled: true
   update-interval: 3  # секунды между проверками
+
+  # Настройки уведомлений
+notifications:
+  # Уведомления о входе/выходе игроков
+  player-join-quit: true
+  
+  # Показывать онлайн в уведомлениях
+  show-online-count: true
+  
+  # Уведомления о запуске/остановке сервера
+  server-start-stop: true
