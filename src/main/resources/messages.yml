@@ -31,7 +31,7 @@ bot:
 
 # Форматы сообщений
 formats:
-  mc-to-tg: "🟢 <player>: <message>"
+  mc-to-tg: "🎮 <player>: <message>"
   tg-to-mc: "&9[TG] &f<user>: &7<message>"
 
 # Сообщения плагина
