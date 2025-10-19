@@ -18,14 +18,19 @@
         </repository>
     </repositories>
     
-    <dependencies>
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.21.1-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+<dependencies>
+    <dependency>
+        <groupId>org.spigotmc</groupId>
+        <artifactId>spigot-api</artifactId>
+        <version>1.19.4-R0.1-SNAPSHOT</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.github.pengrad</groupId>
+        <artifactId>java-telegram-bot-api</artifactId>
+        <version>6.7.0</version>
+    </dependency>
+</dependencies>
     
     <build>
         <plugins>
